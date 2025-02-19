@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Install Versionize
+      run: dotnet tool install --global Versionize
+
+    - name: Setup git
+      run: |
+        git config --global user.email opencommissioning@spiratec.com
+        git config --global user.name "oc-bot"
+      
+    - name: Versioning
+      id: versionize
+      run: versionize --exit-insignificant-commits
+      continue-on-error: true
+
+    - name: Get current version
+      if: steps.versionize.outcome == 'success'
+      run: echo "VERSION=v$(versionize inspect)" >> $GITHUB_ENV
+
+    - name: Get current changelog
+      if: steps.versionize.outcome == 'success'
+      run: echo "$(versionize changelog)" > latest_changelog.md
+    
+    - name: Push changes to GitHub
+      if: steps.versionize.outcome == 'success'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+        tags: true
+
+    - name: Dotnet build
+      if: steps.versionize.outcome == 'success'
+      run: |
+        dotnet build OC.OfficeLite --configuration release --output ./Publish
+        dotnet build OC.OfficeLiteServer --configuration release --output ./Publish
+
+    - name: Publish new release
+      if: steps.versionize.outcome == 'success'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create ${{env.VERSION}} -t "Release ${{env.VERSION}}" -F latest_changelog.md
+        cd ./Publish
+        mkdir OC.OfficeLite
+        mv OC.OfficeLite.dll OC.OfficeLite/
+        mv Config.plugin OC.OfficeLite/
+        zip -r OC.OfficeLite_${{env.VERSION}}.zip OC.OfficeLite
+        gh release upload ${{env.VERSION}} OC.OfficeLite_${{env.VERSION}}.zip
+        mkdir OC.OfficeLiteServer
+        mv OC.OfficeLiteServer.exe OC.OfficeLiteServer/
+        zip -r OC.OfficeLiteServer_${{env.VERSION}}.zip OC.OfficeLiteServer
+        gh release upload ${{env.VERSION}} OC.OfficeLiteServer_${{env.VERSION}}.zip
