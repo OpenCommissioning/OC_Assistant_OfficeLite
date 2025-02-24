@@ -18,7 +18,7 @@ Connects to a KUKA.OfficeLite VM using the Y200 interface.
 - _IpAddress_: IP Address of the OfficeLite VM
 - _Port_: The port the `OfficeLiteServer` is listening on
 - _IoSize_: Size of the KRC I/O image in bytes
-- _InterpolationTime_: Axis interpolation step time in milliseconds. Usually, the Y200 interface updates the axis values every 70ms. Therefore, this parameter can be used to interpolate for a smooth axis movement in the 3D visualization. Can also be turned off with value 0.
+- _InterpolationTime_: Axis interpolation step time in milliseconds. The Y200 interface updates the axis values at a specific rate, which may depend on KSS versions or different environment settings. In our test cases, the update rate has been approximately 70ms. This parameter can be used to interpolate for a smooth axis movement in the 3D visualization. To disable interpolation, set the value to 0.
 
 ### Requirements
 To run the plugin, you need a KUKA.OfficeLite VM with a valid license.\
