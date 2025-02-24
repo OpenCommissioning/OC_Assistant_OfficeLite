@@ -11,10 +11,6 @@
         <TextBox x:Name="PortInput" Margin="50 0 0 0"/>
     </Grid>
     <Grid Margin="4">
-        <Label VerticalAlignment="Center">I/O Size</Label>
-        <TextBox x:Name="IoSizeInput" Margin="50 0 0 0"/>
-    </Grid>
-    <Grid Margin="4">
         <Label VerticalAlignment="Center">Config</Label>
         <TextBox x:Name="Config" Margin="50 0 0 0"/>
     </Grid>

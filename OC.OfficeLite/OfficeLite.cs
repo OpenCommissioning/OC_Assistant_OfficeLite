@@ -8,32 +8,36 @@ namespace OC.OfficeLite;
 [PluginIoType(IoType.Struct)]
 public class OfficeLite : PluginBase
 {
+    private const uint DATA_SIZE_FROM_KRC = 1160;
+    private const uint DATA_SIZE_TO_KRC = 1040;
+    
     [PluginParameter("IP Address of the\nOfficeLite VM")]
     private readonly string _iPAddress = "192.168.0.1";
         
     [PluginParameter("Default 50000")]
     private readonly int _port = 50000;
-        
-    [PluginParameter("Number of axes\nDefault 6\nUp to 12")]
-    private readonly int _axisNo = 6;
-        
-    [PluginParameter("Size of the I/O image in bytes\nDefault 1024")]
-    private readonly int _ioSize = 1024;
     
     [PluginParameter("Axis interpolation step time in milliseconds\n0 = no interpolation\nDefault value is 70")]
     private readonly int _interpolationTime = 70;
 
     private Client? _client;
-    private byte[] _sendData = [];
-    private byte[] _receiveData = [];
-    private Interpolator[] _interpolator = [];
+    private readonly byte[] _sendData = new byte [DATA_SIZE_TO_KRC];
+    private readonly byte[] _receiveData = new byte [DATA_SIZE_FROM_KRC];
+    private readonly Interpolator[] _interpolator = new Interpolator[12];
     private readonly StopwatchEx _stopwatch = new();
-
+    
     protected override bool OnSave()
     {
-        InputStructure.AddVariable("Input", TcType.Byte, _ioSize);
-        OutputStructure.AddVariable("Output", TcType.Byte, _ioSize);
-        OutputStructure.AddVariable("Axis", TcType.Real, _axisNo);
+        InputStructure.AddVariable("Input", TcType.Byte, 1024);
+        InputStructure.AddVariable("StandardSafety", TcType.Dword);
+        
+        OutputStructure.AddVariable("Output", TcType.Byte, 1024);
+        OutputStructure.AddVariable("Axis", TcType.Real, 12);
+        OutputStructure.AddVariable("StandardSafety", TcType.Dword);
+        OutputStructure.AddVariable("Sop1", TcType.Dword);
+        OutputStructure.AddVariable("Sop2", TcType.Dword);
+        OutputStructure.AddVariable("Reserve", TcType.Dword);
+        
         return true;
     }
 
@@ -46,15 +50,12 @@ public class OfficeLite : PluginBase
         }
             
         _stopwatch.Restart();
-        _sendData = new byte [_ioSize];
-        _receiveData = new byte[48 + _ioSize];
         _client = new Client(_iPAddress, _port);
         _client.Start();
         _client.OnConnected += ClientOnConnected;
         _client.OnServerMessage += ClientOnServerMessage;
         _client.OnError += message => Logger.LogWarning(this, message);
-        _interpolator = new Interpolator[_axisNo];
-        for (var i = 0; i < _axisNo; i++) _interpolator[i] = new Interpolator(_interpolationTime / 1000.0f);
+        for (var i = 0; i < 12; i++) _interpolator[i] = new Interpolator(_interpolationTime / 1000.0f);
         return true;
     }
 
@@ -62,22 +63,24 @@ public class OfficeLite : PluginBase
     {
         try
         {
-            Array.Copy(InputBuffer, _sendData, _ioSize);
+            Array.Copy(InputBuffer, _sendData, 1028);
 
             if (_interpolationTime == 0)
             {
-                Array.Copy(_receiveData, 0, OutputBuffer, 0, _ioSize + 4 * _axisNo);
+                Array.Copy(_receiveData, 0, OutputBuffer, 0, 1072);
+                Array.Copy(_receiveData, 1144, OutputBuffer, 1072, 16);
                 return;
             }
             
-            Array.Copy(_receiveData, 0, OutputBuffer, 0, _ioSize);
-            for (var i = 0; i < _axisNo; i++)
+            Array.Copy(_receiveData, 0, OutputBuffer, 0, 1024);
+            for (var i = 0; i < 12; i++)
             {
-                var offset = _ioSize + i * 4;
+                var offset = 1024 + i * 4;
                 var rawValue = BitConverter.ToSingle(_receiveData, offset);
                 var interpolatedValue = BitConverter.GetBytes((float)_interpolator[i].Calculate(rawValue));
                 Array.Copy(interpolatedValue, 0, OutputBuffer, offset, 4);
             }
+            Array.Copy(_receiveData, 1144, OutputBuffer, 1072, 16);
         }
         catch (Exception e)
         {

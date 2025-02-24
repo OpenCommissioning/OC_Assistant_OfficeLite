@@ -7,7 +7,6 @@ namespace OC.OfficeLiteServer;
 public class Settings
 {
     public int Port { get; set; } = 50000;
-    public int IoSize { get; set; } = 1024;
     public string Config { get; set; } = @"C:\KRC\User\Y200Interface.config";
 }
 

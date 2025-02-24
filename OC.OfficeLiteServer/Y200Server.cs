@@ -5,20 +5,14 @@ using OC.Assistant.Sdk;
 
 namespace OC.OfficeLiteServer;
 
-public class Y200Server
+public class Y200Server(Settings settings)
 {
-    private readonly Assistant.Sdk.TcpIp.Server _tcpListener;
-    private readonly Settings _settings;
-    private readonly byte[] _sendBuffer;
+    private const uint DATA_SIZE_FROM_KRC = 1160;
+    private const uint DATA_SIZE_TO_KRC = 1040;
+    private readonly Assistant.Sdk.TcpIp.Server _tcpListener = new(IPAddress.Any, settings.Port);
+    private readonly byte[] _sendBuffer = new byte[DATA_SIZE_FROM_KRC];
     private int _handle;
-
-    public Y200Server(Settings settings)
-    {
-        _settings = settings;
-        _sendBuffer = new byte[48 + _settings.IoSize];
-        _tcpListener = new Assistant.Sdk.TcpIp.Server(IPAddress.Any, settings.Port);
-    }
-        
+    
     public void Start()
     {
         if (_handle != 0) return; 
@@ -43,9 +37,9 @@ public class Y200Server
 
     private bool InitializeY200()
     {
-        if (!File.Exists(_settings.Config))
+        if (!File.Exists(settings.Config))
         {
-            Logger.LogError(this, $"'{_settings.Config}' not found");
+            Logger.LogError(this, $"'{settings.Config}' not found");
             return false;
         }
                                
@@ -57,37 +51,37 @@ public class Y200Server
 
         try
         {
-            var config = XDocument.Load(_settings.Config).Root;
+            var config = XDocument.Load(settings.Config).Root;
             
             if (config?.Element("Y200IpcName")?.Value is not {} ipcName)
             {
-                Logger.LogError(this, $"Error reading Y200WriteOffset from '{_settings.Config}'");
+                Logger.LogError(this, $"Error reading Y200WriteOffset from '{settings.Config}'");
                 return false;
             }
             
             if (!uint.TryParse(config.Element("Y200WriteOffset")?.Value, out var writeOffset))
             {
-                Logger.LogError(this, $"Error reading Y200WriteOffset from '{_settings.Config}'");
+                Logger.LogError(this, $"Error reading Y200WriteOffset from '{settings.Config}'");
                 return false;
             }
             
             if (!uint.TryParse(config.Element("Y200ReadOffset")?.Value, out var readOffset))
             {
-                Logger.LogError(this, $"Error reading Y200ReadOffset from '{_settings.Config}'");
+                Logger.LogError(this, $"Error reading Y200ReadOffset from '{settings.Config}'");
                 return false;
             }
             
             var result = (Y200.Result)Y200.WMY200CreateIPCRange(
                 ipcName,
                 writeOffset,
-                1160u,
+                DATA_SIZE_FROM_KRC,
                 readOffset,
-                1040u,
+                DATA_SIZE_TO_KRC,
                 ref _handle);
 
             if (result == 0 && _handle != 0)
             {
-                Logger.LogInfo(this, $"Y200 connection ok, I/O size {_settings.IoSize}");
+                Logger.LogInfo(this, "Y200 connection ok");
                 return true;
             }
             
@@ -121,19 +115,22 @@ public class Y200Server
     {
         try
         {
-            if (messageLength != _settings.IoSize) return;
-            var result = (Y200.Result)Y200.WMY200WriteBlock8(_handle, buffer, 0, (uint)_settings.IoSize);
+            if (messageLength != DATA_SIZE_TO_KRC) return;
+            
+            var result = (Y200.Result)Y200.WMY200WriteBlock8(_handle, buffer, 0, DATA_SIZE_TO_KRC);
             if (result != Y200.Result.Ok)
             {
                 Logger.LogError(this, $"WMY200WriteBlock8 error: {result}");
                 return;
             }
-            result = (Y200.Result)Y200.WMY200ReadBlock8(_handle, _sendBuffer, 0, 48 + (uint)_settings.IoSize);
+            
+            result = (Y200.Result)Y200.WMY200ReadBlock8(_handle, _sendBuffer, 0, DATA_SIZE_FROM_KRC);
             if (result != Y200.Result.Ok)
             {
                 Logger.LogError(this, $"WMY200ReadBlock8 error: {result}");
                 return;
             }
+            
             _tcpListener.Send(_sendBuffer);
         }
         catch(Exception e)
