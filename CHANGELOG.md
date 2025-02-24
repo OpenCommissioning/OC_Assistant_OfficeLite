@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.0.1"></a>
+## [1.0.1](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.0.1) (2025-02-24)
+
+### Bug Fixes
+
+* implement safety in- and outputs ([cb53b0e](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/cb53b0efb50b5f2b775f725b5dd1a5efa258a96a))
+
 <a name="1.0.0"></a>
 ## [1.0.0](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.0.0) (2025-02-19)
 
