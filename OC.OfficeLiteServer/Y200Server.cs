@@ -7,8 +7,16 @@ namespace OC.OfficeLiteServer;
 
 public class Y200Server(Settings settings)
 {
-    private const uint DATA_SIZE_FROM_KRC = 1160;
-    private const uint DATA_SIZE_TO_KRC = 1040;
+    /// <summary>
+    /// Output[1024] + Axis[48] + Position[24] + Tool[24] + Base[24]
+    /// </summary>
+    private const uint DATA_SIZE_FROM_KRC = 1144;
+    
+    /// <summary>
+    /// Input[1024]
+    /// </summary>
+    private const uint DATA_SIZE_TO_KRC = 1024;
+    
     private readonly Assistant.Sdk.TcpIp.Server _tcpListener = new(IPAddress.Any, settings.Port);
     private readonly byte[] _sendBuffer = new byte[DATA_SIZE_FROM_KRC];
     private int _handle;
