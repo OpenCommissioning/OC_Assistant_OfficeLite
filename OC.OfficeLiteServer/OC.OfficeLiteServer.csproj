@@ -9,7 +9,7 @@
         <Nullable>enable</Nullable>
         <Company>Spiratec AG</Company>
         <LangVersion>default</LangVersion>
-        <Version>1.0.1</Version>
+        <Version>1.0.2</Version>
         <TargetFramework>net481</TargetFramework>
     </PropertyGroup>
 

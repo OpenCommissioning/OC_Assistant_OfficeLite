@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.0.2"></a>
+## [1.0.2](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.0.2) (2025-06-02)
+
+### Bug Fixes
+
+* adjust transmitted KRC data length ([22f27cf](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/22f27cf8f1b5b8413e72e31eba0a6ceced03533a))
+* upgrade sdk and theme package reference ([055636a](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/055636adf9b94d356d72998c289b5f5d233523c9))
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.0.1) (2025-02-24)
 
