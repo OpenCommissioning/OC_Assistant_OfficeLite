@@ -28,18 +28,22 @@ public partial class MainWindow
         _server?.Stop();
     }
 
-    private void SettingsOnClick(object sender, RoutedEventArgs e)
+    private async void SettingsOnClick(object sender, RoutedEventArgs e)
     {
-        var settings = new SettingsView();
+        try
+        {
+            var settings = new SettingsView();
+            var result = await Modal.Show("Settings", settings, MessageBoxButton.OKCancel, MessageBoxImage.None);
+            if (result != MessageBoxResult.OK || !settings.Apply()) return;
         
-        var result = Assistant.Theme.MessageBox
-            .Show("Settings", settings, MessageBoxButton.OKCancel, MessageBoxImage.None);
-
-        if (result != MessageBoxResult.OK || !settings.Apply()) return;
-        
-        Logger.LogInfo(this, "Restarting server...");
-        _server?.Stop();
-        _server = new Y200Server(settings.Settings);
-        _server.Start();
+            Logger.LogInfo(this, "Restarting server...");
+            _server?.Stop();
+            _server = new Y200Server(settings.Settings);
+            _server.Start();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(this, ex.Message);
+        }
     }
 }

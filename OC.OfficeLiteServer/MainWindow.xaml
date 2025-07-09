@@ -9,19 +9,25 @@
         WindowStartupLocation="CenterScreen"
         Title="OfficeLiteServer" Height="350" Width="525"
         Closing="MainWindow_OnClosing">
-        <Grid>
+    <Grid>
+        <Border>
+            <Border.Effect><BlurEffect x:Name="BlurEffect" Radius="0"></BlurEffect></Border.Effect>
+            <Grid>
                 <theme:LogViewer x:Name="LogViewer" Background="Transparent"/>
                 <Button 
-                        VerticalAlignment="Top" 
-                        HorizontalAlignment="Right" 
-                        Click="SettingsOnClick" 
-                        Margin="1" 
-                        Height="26" 
-                        Width="40"
-                        FontSize="14"
-                        Padding="0"
-                        FontFamily="{DynamicResource SymbolThemeFontFamily}">
-                        
+                    VerticalAlignment="Top" 
+                    HorizontalAlignment="Right" 
+                    Click="SettingsOnClick" 
+                    Margin="1" 
+                    Height="26" 
+                    Width="40"
+                    FontSize="14"
+                    Padding="0"
+                    FontFamily="{DynamicResource SymbolThemeFontFamily}">
+                    
                 </Button>
-        </Grid>
+            </Grid>
+        </Border>
+        <theme:Modal BlurEffect="{x:Reference BlurEffect}"></theme:Modal>
+    </Grid>
 </Window>
