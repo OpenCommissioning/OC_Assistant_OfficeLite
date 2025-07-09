@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.1.0"></a>
+## [1.1.0](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.1.0) (2025-07-09)
+
+### Features
+
+* upgrade packages and use new modal ([5f95c68](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/5f95c680052721fb1bdfcfa3e66eca382583509d))
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.0.2) (2025-06-02)
 
