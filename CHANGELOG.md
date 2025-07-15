@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.2.1"></a>
+## [1.2.1](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.2.1) (2025-07-15)
+
+### Bug Fixes
+
+* adjust settings icon ([e452524](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/e452524264a83c8be97d543f85d567fc5ef1b297))
+* upgrade theme package reference ([9e4aa5e](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/9e4aa5ece3d1a342a57bfb61fd9e617396ac6e98))
+
 <a name="1.2.0"></a>
 ## [1.2.0](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.2.0) (2025-07-12)
 
