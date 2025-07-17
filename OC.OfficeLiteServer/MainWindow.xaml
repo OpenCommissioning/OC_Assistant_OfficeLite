@@ -15,13 +15,16 @@
     <theme:Window.TitleBarContent>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button 
-                FontFamily="{DynamicResource SymbolThemeFontFamily}"
                 FontSize="14"
                 ToolTip="Settings"
-                Content="&#xE712;" 
-                Click="SettingsOnClick"/>
+                Click="SettingsOnClick">
+                <ContentControl
+                    Margin="0 -3 2 3"
+                    Template="{DynamicResource IconTemplate}"
+                    Content="{DynamicResource IconMore}"/>
+            </Button>
             <Border Width="1" Background="{DynamicResource White4Brush}" Margin="6 8 0 8"/>
         </StackPanel>
     </theme:Window.TitleBarContent>
-    <theme:LogViewer x:Name="LogViewer" Background="Transparent"/>
+    <theme:LogViewer x:Name="LogViewer"/>
 </theme:Window>
