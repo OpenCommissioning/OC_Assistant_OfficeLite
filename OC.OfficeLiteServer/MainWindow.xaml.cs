@@ -33,7 +33,8 @@ public partial class MainWindow
         try
         {
             var settings = new SettingsView();
-            var result = await Modal.Show("Settings", settings, MessageBoxButton.OKCancel, MessageBoxImage.None);
+            var result = await Assistant.Theme.MessageBox
+                .Show("Settings", settings, MessageBoxButton.OKCancel, MessageBoxImage.None);
             if (result != MessageBoxResult.OK || !settings.Apply()) return;
         
             Logger.LogInfo(this, "Restarting server...");
