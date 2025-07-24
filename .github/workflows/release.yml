@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout
@@ -34,11 +34,17 @@ jobs:
 
     - name: Get current version
       if: steps.versionize.outcome == 'success'
-      run: echo "VERSION=v$(versionize inspect)" >> $GITHUB_ENV
+      run: |
+        $version = versionize inspect
+        echo "VERSION=v$version" >> $env:GITHUB_ENV
+      shell: pwsh
 
     - name: Get current changelog
       if: steps.versionize.outcome == 'success'
-      run: echo "$(versionize changelog)" > latest_changelog.md
+      run: |
+        $changelog = versionize changelog
+        Set-Content -Path latest_changelog.md -Value $changelog
+      shell: pwsh
     
     - name: Push changes to GitHub
       if: steps.versionize.outcome == 'success'
@@ -53,6 +59,34 @@ jobs:
       run: |
         dotnet build OC.OfficeLite --configuration release --output ./Publish
         dotnet build OC.OfficeLiteServer --configuration release --output ./Publish
+        
+    - name: Install AzureSignTool
+      run: dotnet tool install --global azuresigntool
+
+    - name: Sign executable
+      if: steps.versionize.outcome == 'success'
+      run: |
+        azuresigntool sign `
+          -kvu ${{secrets.AZURE_KEY_VAULT}} `
+          -kvc ${{secrets.AZURE_CERT_NAME}} `
+          -kvt ${{secrets.AZURE_TENANT_ID}} `
+          -kvi ${{secrets.AZURE_CLIENT_ID}} `
+          -kvs ${{secrets.AZURE_CLIENT_SECRET}} `
+          -tr http://timestamp.globalsign.com/tsa/advanced `
+          -td sha256 `
+          ./Publish/OC.OfficeLite.dll `
+          ./Publish/OC.OfficeLiteServer.exe
+        
+    - name: Zip signed artifacts
+      if: steps.versionize.outcome == 'success'
+      run: |
+        mkdir OC.OfficeLite
+        mv OC.OfficeLite.dll OC.OfficeLite/
+        mv Config.plugin OC.OfficeLite/
+        Compress-Archive -Path OC.OfficeLite -DestinationPath OC.OfficeLite_${{env.VERSION}}.zip
+        Compress-Archive -Path OC.OfficeLiteServer.exe -DestinationPath OC.OfficeLiteServer_${{env.VERSION}}.zip
+      shell: pwsh
+      working-directory: Publish
 
     - name: Publish new release
       if: steps.versionize.outcome == 'success'
@@ -60,13 +94,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         gh release create ${{env.VERSION}} -t "Release ${{env.VERSION}}" -F latest_changelog.md
-        cd ./Publish
-        mkdir OC.OfficeLite
-        mv OC.OfficeLite.dll OC.OfficeLite/
-        mv Config.plugin OC.OfficeLite/
-        zip -r OC.OfficeLite_${{env.VERSION}}.zip OC.OfficeLite
-        gh release upload ${{env.VERSION}} OC.OfficeLite_${{env.VERSION}}.zip
-        mkdir OC.OfficeLiteServer
-        mv OC.OfficeLiteServer.exe OC.OfficeLiteServer/
-        zip -r OC.OfficeLiteServer_${{env.VERSION}}.zip OC.OfficeLiteServer
-        gh release upload ${{env.VERSION}} OC.OfficeLiteServer_${{env.VERSION}}.zip
+        gh release upload ${{env.VERSION}} ./Publish/OC.OfficeLite_${{env.VERSION}}.zip
+        gh release upload ${{env.VERSION}} ./Publish/OC.OfficeLiteServer_${{env.VERSION}}.zip
