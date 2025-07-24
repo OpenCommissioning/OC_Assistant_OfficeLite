@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.3.0"></a>
+## [1.3.0](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.3.0) (2025-07-24)
+
+### Features
+
+* OC.OfficeLite.dll and OC.OfficeLiteServer.exe are now codesigned ([25a6520](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/25a6520790d18759d01fd9791a0874a08a1b8e15))
+
+### Bug Fixes
+
+* upgrade nuget packages ([687b4c4](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/687b4c46b989f0b1dfaaa08b8658ae9a46fe67d0))
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.2.1) (2025-07-15)
 

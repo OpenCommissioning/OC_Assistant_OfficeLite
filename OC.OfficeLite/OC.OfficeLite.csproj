@@ -6,7 +6,7 @@
         <Company>Spiratec AG</Company>
         <Product>OC.OfficeLite</Product>
         <LangVersion>default</LangVersion>
-        <Version>1.2.1</Version>
+        <Version>1.3.0</Version>
         <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
