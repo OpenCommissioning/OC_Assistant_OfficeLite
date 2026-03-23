@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Windows;
-using OC.Assistant.Sdk;
 using OC.Assistant.Theme;
 
 namespace OC.OfficeLiteServer;
@@ -12,7 +11,6 @@ public partial class MainWindow
     public MainWindow()
     {
         InitializeComponent();
-        LogViewer.LogFilePath = App.LogFilePath;
         Logger.Info += (sender, message) => LogViewer.Add(sender, message, MessageType.Info);
         Logger.Warning += (sender, message) => LogViewer.Add(sender, message, MessageType.Warning);
         Logger.Error += (sender, message) => LogViewer.Add(sender, message, MessageType.Error);

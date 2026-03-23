@@ -28,8 +28,7 @@
       <PackageReference Include="Costura.Fody" Version="5.7.0">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="OC.Assistant.Sdk" Version="1.7.1" />
-      <PackageReference Include="OC.Assistant.Theme" Version="2.1.0" />
+      <PackageReference Include="OC.Assistant.Theme" Version="2.2.3" />
       <PackageReference Include="System.Text.Json" Version="9.0.5" />
     </ItemGroup>
 
