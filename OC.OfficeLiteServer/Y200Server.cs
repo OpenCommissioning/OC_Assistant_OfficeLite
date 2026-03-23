@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Net;
 using System.Xml.Linq;
-using OC.Assistant.Sdk;
 
 namespace OC.OfficeLiteServer;
 
@@ -17,7 +16,7 @@ public class Y200Server(Settings settings)
     /// </summary>
     private const uint DATA_SIZE_TO_KRC = 1024;
     
-    private readonly Assistant.Sdk.TcpIp.Server _tcpListener = new(IPAddress.Any, settings.Port);
+    private readonly TcpIpServer _tcpListener = new(IPAddress.Any, settings.Port);
     private readonly byte[] _sendBuffer = new byte[DATA_SIZE_FROM_KRC];
     private int _handle;
     
