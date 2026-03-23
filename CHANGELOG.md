@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.3.1"></a>
+## [1.3.1](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.3.1) (2026-03-23)
+
+### Bug Fixes
+
+* **OfficeLite:** implement own TcpIpClient ([ce49088](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/ce4908847591674ff058d39de66cfde82e96e7a6))
+* **OfficeLiteServer:** remove sdk dependency and implement TcpIpServer and Logger ([b1b5cb1](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/b1b5cb1df05fdfe6582e175cf9c923786af31555))
+
 <a name="1.3.0"></a>
 ## [1.3.0](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.3.0) (2025-07-24)
 
