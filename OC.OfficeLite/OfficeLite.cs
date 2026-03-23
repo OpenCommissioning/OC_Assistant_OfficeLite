@@ -1,7 +1,6 @@
 ﻿using System.Net.NetworkInformation;
 using OC.Assistant.Sdk.Plugin;
 using OC.Assistant.Sdk;
-using OC.Assistant.Sdk.TcpIp;
 
 namespace OC.OfficeLite;
 
@@ -27,7 +26,7 @@ public class OfficeLite : PluginBase
     [PluginParameter("Axis interpolation step time in milliseconds\n0 = no interpolation\nDefault value is 70")]
     private readonly int _interpolationTime = 70;
 
-    private Client? _client;
+    private TcpIpClient? _client;
     private readonly byte[] _sendData = new byte [DATA_SIZE_TO_KRC];
     private readonly byte[] _receiveData = new byte [DATA_SIZE_FROM_KRC];
     private readonly Interpolator[] _interpolator = new Interpolator[12];
@@ -60,7 +59,7 @@ public class OfficeLite : PluginBase
         }
             
         _stopwatch.Restart();
-        _client = new Client(_iPAddress, _port);
+        _client = new TcpIpClient(_iPAddress, _port);
         _client.Start();
         _client.OnConnected += ClientOnConnected;
         _client.OnServerMessage += ClientOnServerMessage;
@@ -108,7 +107,7 @@ public class OfficeLite : PluginBase
     {
         try
         {
-            _client?.Stop();
+            _client?.Dispose();
         }
         catch (Exception e)
         {
@@ -127,8 +126,8 @@ public class OfficeLite : PluginBase
 
     private void ClientOnServerMessage(byte[] buffer, int messageLength)
     {
-        if (messageLength != _receiveData.Length) return;
-        Array.Copy(buffer, 0, _receiveData, 0, messageLength);
+        if (messageLength != DATA_SIZE_FROM_KRC) return;
+        Array.Copy(buffer, 0, _receiveData, 0, DATA_SIZE_FROM_KRC);
         _stopwatch.WaitUntil(1);
         _client?.Send(_sendData);
     }
