@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace OC.OfficeLiteServer;
 
@@ -11,33 +10,42 @@ public class Settings
 
 public static class SettingsExtension
 {
-    public static Settings Read(this Settings settings)
-    {
-        try
-        {
-            if (!File.Exists(App.SettingsPath))
-            {
-                settings.Write();
-            }
-            settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(App.SettingsPath)) ?? settings;
-        }
-        catch (Exception e)
-        {
-            Logger.LogError(typeof(Settings), e.Message);
-        }
-        
-        return settings;
-    }
+    private static readonly string Folder = 
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OC.OfficeLiteServer");
+
+    private static readonly string SettingsPath = 
+        Path.Combine(Directory.CreateDirectory(Folder).FullName, "settings.json");
     
-    public static void Write(this Settings settings)
+    extension(Settings settings)
     {
-        try
-        { 
-            File.WriteAllText(App.SettingsPath, JsonSerializer.Serialize(settings));
+        public Settings Read()
+        {
+            try
+            {
+                if (!File.Exists(SettingsPath))
+                {
+                    settings.Write();
+                }
+                settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(SettingsPath)) ?? settings;
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.Message);
+            }
+        
+            return settings;
         }
-        catch (Exception e)
-        { 
-            Logger.LogError(typeof(Settings), e.Message);
+
+        public void Write()
+        {
+            try
+            { 
+                File.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings));
+            }
+            catch (Exception e)
+            { 
+                Log.Error(e.Message);
+            }
         }
     }
 }
