@@ -8,12 +8,13 @@ var token = cancel.Token;
 
 const string header =
     """
-     ────────────────────────────────────────────
-     OC.OfficeLiteServer ©2026 Open Commissioning
+     ──────────────────────────────────────────────────
+       OC.OfficeLiteServer (c)2026 Open Commissioning
      
-     '/' to open the command menu
-     ENTER to select, ESC to cancel
-     ────────────────────────────────────────────
+       '/' to open the command menu
+       ENTER to select, ESC to cancel
+     ──────────────────────────────────────────────────
+     
      """;
 
 var commands = new (string Name, string? Argument, string Description)[]
@@ -150,7 +151,7 @@ static void DrawMenu((string Name, string? Argument, string Description)[] comma
     for (var i = 0; i < commands.Length; i++)
     {
         Console.SetCursorPosition(0, top + i);
-        var label = $"/{commands[i].Name} {commands[i].Argument}";
+        var label = $" /{commands[i].Name} {commands[i].Argument}";
         var line = label.PadRight(22) + commands[i].Description;
         var width = Math.Max(1, Console.WindowWidth - 1);
         line = line.Length > width ? line.Substring(0, width) : line.PadRight(width);

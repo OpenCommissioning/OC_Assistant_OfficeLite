@@ -9,7 +9,7 @@ public static class Log
         lock (Lock)
         {
             if (Console.CursorVisible) return;
-            Console.WriteLine(message);
+            Console.WriteLine($"> {message}");
         }
     }
     
@@ -19,7 +19,7 @@ public static class Log
         {
             if (Console.CursorVisible) return;
             Console.ForegroundColor = color;
-            Console.WriteLine(message);
+            Console.WriteLine($"> {message}");
             Console.ResetColor();
         }
     }
