@@ -155,10 +155,10 @@ static void DrawMenu((string Name, string? Argument, string Description)[] comma
         var width = Math.Max(1, Console.WindowWidth - 1);
         line = line.Length > width ? line.Substring(0, width) : line.PadRight(width);
 
+        Console.ForegroundColor = ConsoleColor.DarkGray;
         if (i == selected)
         {
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.Cyan;
         }
         Console.Write(line);
         Console.ResetColor();
