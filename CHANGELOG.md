@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.4.0"></a>
+## [1.4.0](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.4.0) (2026-06-23)
+
+### Features
+
+* **OfficeLiteServer:** migrate to a CLI application ([6db4512](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/6db45123bfe2e1aa77dc307002e601059aaf5435))
+
+### Bug Fixes
+
+* **OfficeLiteServer:** remove costura and json dependencies ([e6f4fd2](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/e6f4fd228b184c8f95810890a3aad22a05ff03f3))
+
 <a name="1.3.1"></a>
 ## [1.3.1](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.3.1) (2026-03-23)
 
