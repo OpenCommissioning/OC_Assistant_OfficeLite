@@ -7,17 +7,21 @@ Connects to a KUKA.OfficeLite VM using the Y200 interface.
 - Download the zip files from the latest release page
 - Unpack the `OC.OfficeLite` zip file and place it in the directory or a subdirectory of the `OC.Assistant.exe`
 - Copy the `OC.OfficeLiteServer` zip file into the OfficeLite VM, unpack and start the `OC.OfficeLiteServer.exe`
-- Start the Assistant and connect or create a TwinCAT solution
+- Start the Assistant and open or create a project
 - Add a new plugin instance using the `+` button 
 - Select `OfficeLite`, configure parameters and press `Apply` ([see also](https://github.com/OpenCommissioning/OC_Assistant?tab=readme-ov-file#installation-1))
-- Depending on the parameters, a TwinCAT GVL with PLC In- and Outputs is generated 
-- The plugin starts when TwinCAT goes to Run Mode and tries to connect to the `OfficeLiteServer` running within the OfficeLite VM
+- After starting the plugin it tries to connect to the `OfficeLiteServer`
 
 ### Plugin Parameters
-- _AutoStart_: Automatic start and stop with TwinCAT
+- _AutoStart_: Automatic start and stop with the Assistant
 - _IpAddress_: IP Address of the OfficeLite VM
 - _Port_: The port the `OfficeLiteServer` is listening on
-- _InterpolationTime_: Axis interpolation step time in milliseconds. The Y200 interface updates the axis values at a specific rate, which may depend on KSS versions or different environment settings. In our test cases, the update rate has been approximately 70ms. This parameter can be used to interpolate for a smooth axis movement in the 3D visualization. To disable interpolation, set the value to 0.
+- _InterpolationTime_: Axis interpolation step time in milliseconds. 
+The Y200 interface updates the axis values at a specific rate, 
+which may depend on KSS versions or different environment settings. 
+In our test cases, the update rate has been approximately 70ms. 
+This parameter can be used to interpolate for a smooth axis movement in the 3D visualization. To disable interpolation, 
+set the value to 0.
 
 ### Requirements
 To run the plugin, you need a KUKA.OfficeLite VM with a valid license.\
@@ -26,6 +30,3 @@ See KUKA OfficeLite documentation how to create and start a Robot using OfficeLi
 
 > [!NOTE]
 > The plugin has been tested with KUKA.OfficeLite KRC4 and KRC5 Versions `KSS 8.5`, `KSS 8.6` and `KSS 8.7`
-
-### Credits for third-party software components
-The `OC.OfficeLiteServer` uses [Fody Costura](https://www.nuget.org/packages/Costura.Fody/) to embed its references.

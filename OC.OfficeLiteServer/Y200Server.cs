@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Net;
+﻿using System.Net;
 using System.Xml.Linq;
 
 namespace OC.OfficeLiteServer;
@@ -26,6 +25,7 @@ public class Y200Server(Settings settings)
             
         Task.Run(() =>
         {
+            Log.Info($"Starting server with port {settings.Port}...");
             if (!InitializeY200()) return;
             StartTcpServer();
         });
@@ -38,7 +38,7 @@ public class Y200Server(Settings settings)
         var result = (Y200.Result)Y200.WMY200DestroyIPCRange(_handle);
         if (result != Y200.Result.Ok)
         {
-            Logger.LogError(this, $"WMY200DestroyIPCRange error: {result}");
+            Log.Error($"WMY200DestroyIPCRange error: {result}");
         }
     }
 
@@ -46,13 +46,13 @@ public class Y200Server(Settings settings)
     {
         if (!File.Exists(settings.Config))
         {
-            Logger.LogError(this, $"'{settings.Config}' not found");
+            Log.Error($"'{settings.Config}' not found");
             return false;
         }
                                
         if (!File.Exists(Y200.PATH))
         {
-            Logger.LogError(this, $"'{Y200.PATH}' not found");
+            Log.Error($"'{Y200.PATH}' not found");
             return false;
         }
 
@@ -62,19 +62,19 @@ public class Y200Server(Settings settings)
             
             if (config?.Element("Y200IpcName")?.Value is not {} ipcName)
             {
-                Logger.LogError(this, $"Error reading Y200WriteOffset from '{settings.Config}'");
+                Log.Error($"Error reading Y200WriteOffset from '{settings.Config}'");
                 return false;
             }
             
             if (!uint.TryParse(config.Element("Y200WriteOffset")?.Value, out var writeOffset))
             {
-                Logger.LogError(this, $"Error reading Y200WriteOffset from '{settings.Config}'");
+                Log.Error($"Error reading Y200WriteOffset from '{settings.Config}'");
                 return false;
             }
             
             if (!uint.TryParse(config.Element("Y200ReadOffset")?.Value, out var readOffset))
             {
-                Logger.LogError(this, $"Error reading Y200ReadOffset from '{settings.Config}'");
+                Log.Error($"Error reading Y200ReadOffset from '{settings.Config}'");
                 return false;
             }
             
@@ -88,16 +88,16 @@ public class Y200Server(Settings settings)
 
             if (result == 0 && _handle != 0)
             {
-                Logger.LogInfo(this, "Y200 connection ok");
+                Log.Info("Y200 connection ok");
                 return true;
             }
             
-            Logger.LogError(this, $"WMY200CreateIPCRange error: {result}");
+            Log.Error($"WMY200CreateIPCRange error: {result}");
             return false;
         }
         catch (Exception e)
         {
-            Logger.LogError(this, e.Message);
+            Log.Error(e.Message);
             return false;
         }
     }
@@ -107,14 +107,14 @@ public class Y200Server(Settings settings)
         try
         {
             _tcpListener.OnClientMessage += TcpListenerOnClientMessage;
-            _tcpListener.OnError += message => Logger.LogError(this, message);
-            _tcpListener.OnConnected += endPoint => Logger.LogInfo(this, $"Connected to {endPoint}");
+            _tcpListener.OnError += Log.Error;
+            _tcpListener.OnConnected += endPoint => Log.Info( $"Connected to {endPoint}");
             _tcpListener.Start();
-            Logger.LogInfo(this, $"Listening on port {_tcpListener.Port}");
+            Log.Info( $"Listening on port {_tcpListener.Port}");
         }
         catch (Exception e)
         {
-            Logger.LogError(this, e.Message);
+            Log.Error(e.Message);
         }
     }
 
@@ -127,14 +127,14 @@ public class Y200Server(Settings settings)
             var result = (Y200.Result)Y200.WMY200WriteBlock8(_handle, buffer, 0, DATA_SIZE_TO_KRC);
             if (result != Y200.Result.Ok)
             {
-                Logger.LogError(this, $"WMY200WriteBlock8 error: {result}");
+                Log.Error( $"WMY200WriteBlock8 error: {result}");
                 return;
             }
             
             result = (Y200.Result)Y200.WMY200ReadBlock8(_handle, _sendBuffer, 0, DATA_SIZE_FROM_KRC);
             if (result != Y200.Result.Ok)
             {
-                Logger.LogError(this, $"WMY200ReadBlock8 error: {result}");
+                Log.Error($"WMY200ReadBlock8 error: {result}");
                 return;
             }
             
@@ -142,7 +142,7 @@ public class Y200Server(Settings settings)
         }
         catch(Exception e)
         {
-            Logger.LogWarning(this, e.Message);
+            Log.Warning(e.Message);
         }
     }
 }

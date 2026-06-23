@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
     - name: Checkout
@@ -45,14 +45,6 @@ jobs:
         $changelog = versionize changelog
         Set-Content -Path latest_changelog.md -Value $changelog
       shell: pwsh
-    
-    - name: Push changes to GitHub
-      if: steps.versionize.outcome == 'success'
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
-        tags: true
 
     - name: Dotnet build
       if: steps.versionize.outcome == 'success'
@@ -76,7 +68,7 @@ jobs:
           -td sha256 `
           ./Publish/OC.OfficeLite.dll `
           ./Publish/OC.OfficeLiteServer.exe
-        
+
     - name: Zip signed artifacts
       if: steps.versionize.outcome == 'success'
       run: |
@@ -87,6 +79,14 @@ jobs:
         Compress-Archive -Path OC.OfficeLiteServer.exe -DestinationPath OC.OfficeLiteServer_${{env.VERSION}}.zip
       shell: pwsh
       working-directory: Publish
+
+    - name: Push changes to GitHub
+      if: steps.versionize.outcome == 'success'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+        tags: true
 
     - name: Publish new release
       if: steps.versionize.outcome == 'success'
