@@ -23,11 +23,4 @@
       <Prefer32bit>false</Prefer32bit>
     </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Costura.Fody" Version="5.7.0">
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-      <PackageReference Include="System.Text.Json" Version="9.0.5" />
-    </ItemGroup>
-
 </Project>

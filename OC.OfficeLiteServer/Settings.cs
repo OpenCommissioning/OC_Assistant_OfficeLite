@@ -1,51 +1,69 @@
-﻿using System.Text.Json;
-
 namespace OC.OfficeLiteServer;
 
 public class Settings
-{
-    public int Port { get; set; } = 50000;
-    public string Config { get; set; } = @"C:\KRC\User\Y200Interface.config";
-}
-
-public static class SettingsExtension
 {
     private static readonly string Folder = 
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OC.OfficeLiteServer");
 
     private static readonly string SettingsPath = 
-        Path.Combine(Directory.CreateDirectory(Folder).FullName, "settings.json");
+        Path.Combine(Directory.CreateDirectory(Folder).FullName, "settings.ini");
     
-    extension(Settings settings)
+    public int Port { get; set; } = 50000;
+    public string Config { get; set; } = @"C:\KRC\User\Y200Interface.config";
+    
+    public Settings Read()
     {
-        public Settings Read()
+        try
         {
-            try
+            if (!File.Exists(SettingsPath))
             {
-                if (!File.Exists(SettingsPath))
-                {
-                    settings.Write();
-                }
-                settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(SettingsPath)) ?? settings;
+                Write();
+                return this;
             }
-            catch (Exception e)
-            {
-                Log.Error(e.Message);
-            }
-        
-            return settings;
-        }
 
-        public void Write()
+            foreach (var line in File.ReadAllLines(SettingsPath))
+            {
+                var separator = line.IndexOf('=');
+                if (separator < 0)
+                {
+                    continue;
+                }
+
+                var key = line.Substring(0, separator).Trim();
+                var value = line.Substring(separator + 1).Trim();
+
+                switch (key)
+                {
+                    case nameof(Port) when int.TryParse(value, out var port):
+                        Port = port;
+                        break;
+                    case nameof(Config):
+                        Config = value;
+                        break;
+                }
+            }
+        }
+        catch (Exception e)
         {
-            try
-            { 
-                File.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings));
-            }
-            catch (Exception e)
-            { 
-                Log.Error(e.Message);
-            }
+            Log.Error(e.Message);
+        }
+        
+        return this;
+    }
+
+    public void Write()
+    {
+        try
+        { 
+            File.WriteAllLines(SettingsPath,
+            [
+                $"{nameof(Port)}={Port}",
+                $"{nameof(Config)}={Config}",
+            ]);
+        }
+        catch (Exception e)
+        { 
+            Log.Error(e.Message);
         }
     }
 }

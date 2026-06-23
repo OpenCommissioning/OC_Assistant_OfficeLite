@@ -1,19 +1,21 @@
+using System.Reflection;
 using System.Text;
 using OC.OfficeLiteServer;
 
+var version = Assembly.GetExecutingAssembly().GetName().Version;
 var settings = new Settings().Read();
 var server = new Y200Server(settings);
 var cancel = new CancellationTokenSource();
 var token = cancel.Token;
 
-const string header =
-    """
-     ──────────────────────────────────────────────────
-       OC.OfficeLiteServer (c)2026 Open Commissioning
-     
+var header =
+    $"""
+     ────────────────────────────────────────────
+       OC.OfficeLiteServer v{version}
+
        '/' to open the command menu
        ENTER to select, ESC to cancel
-     ──────────────────────────────────────────────────
+     ────────────────────────────────────────────
      
      """;
 
