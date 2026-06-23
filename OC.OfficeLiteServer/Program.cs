@@ -1,8 +1,6 @@
-using System.Reflection;
 using System.Text;
 using OC.OfficeLiteServer;
 
-var version = Assembly.GetExecutingAssembly().GetName().Version;
 var settings = new Settings().Read();
 var server = new Y200Server(settings);
 var cancel = new CancellationTokenSource();
@@ -11,7 +9,7 @@ var token = cancel.Token;
 var header =
     $"""
      ────────────────────────────────────────────
-       OC.OfficeLiteServer v{version}
+       {Settings.AppName.Name} v{Settings.AppName.Version}
 
        '/' to open the command menu
        ENTER to select, ESC to cancel
@@ -31,7 +29,7 @@ var commands = new (string Name, string? Argument, string Description)[]
 
 Console.CancelKeyPress += (_, _) => cancel.Cancel();
 Console.CursorVisible = false;
-Console.Title = "OC.OfficeLiteServer";
+Console.Title = Settings.AppName.Name;
 Console.WriteLine(header);
 
 _ = Task.Run(() =>

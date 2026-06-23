@@ -1,9 +1,13 @@
+using System.Reflection;
+
 namespace OC.OfficeLiteServer;
 
 public class Settings
 {
+    public static readonly AssemblyName AppName = Assembly.GetExecutingAssembly().GetName();
+    
     private static readonly string Folder = 
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OC.OfficeLiteServer");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppName.Name);
 
     private static readonly string SettingsPath = 
         Path.Combine(Directory.CreateDirectory(Folder).FullName, "settings.ini");
