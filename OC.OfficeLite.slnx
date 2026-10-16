@@ -1,4 +1,3 @@
 ﻿<Solution>
   <Project Path="OC.OfficeLite\OC.OfficeLite.csproj" Type="Classic C#" />
-  <Project Path="OC.OfficeLiteServer\OC.OfficeLiteServer.csproj" Type="Classic C#" />
 </Solution>

@@ -48,10 +48,8 @@ jobs:
 
     - name: Dotnet build
       if: steps.versionize.outcome == 'success'
-      run: |
-        dotnet build OC.OfficeLite --configuration release --output ./Publish
-        dotnet build OC.OfficeLiteServer --configuration release --output ./Publish
-        
+      run: dotnet build OC.OfficeLite --configuration release --output ./Publish
+
     - name: Install AzureSignTool
       run: dotnet tool install --global azuresigntool
 
@@ -66,8 +64,7 @@ jobs:
           -kvs ${{secrets.AZURE_CLIENT_SECRET}} `
           -tr http://timestamp.globalsign.com/tsa/advanced `
           -td sha256 `
-          ./Publish/OC.OfficeLite.dll `
-          ./Publish/OC.OfficeLiteServer.exe
+          ./Publish/OC.OfficeLite.dll
 
     - name: Zip signed artifacts
       if: steps.versionize.outcome == 'success'
@@ -76,7 +73,6 @@ jobs:
         mv OC.OfficeLite.dll OC.OfficeLite/
         mv Config.plugin OC.OfficeLite/
         Compress-Archive -Path OC.OfficeLite -DestinationPath OC.OfficeLite_${{env.VERSION}}.zip
-        Compress-Archive -Path OC.OfficeLiteServer.exe -DestinationPath OC.OfficeLiteServer_${{env.VERSION}}.zip
       shell: pwsh
       working-directory: Publish
 
@@ -95,4 +91,3 @@ jobs:
       run: |
         gh release create ${{env.VERSION}} -t "Release ${{env.VERSION}}" -F latest_changelog.md
         gh release upload ${{env.VERSION}} ./Publish/OC.OfficeLite_${{env.VERSION}}.zip
-        gh release upload ${{env.VERSION}} ./Publish/OC.OfficeLiteServer_${{env.VERSION}}.zip
