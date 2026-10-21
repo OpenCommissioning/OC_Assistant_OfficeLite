@@ -1,9 +1,9 @@
-# Open Commissioning Assistant Plugin for OfficeLite
+# OC.Assistant Plugin for OfficeLite
 
 ### Description
 Connects to a KUKA.OfficeLite VM using the Y200 interface.
 The plugin communicates with the Y200 Remote Server running on the VM,
-which gives access to the Y200 shared memory process image of the robot controller.
+which gives access to the I/Os and axis values of the robot controller.
 
 ### Quick Getting Started
 - Download the zip file from the latest release page
