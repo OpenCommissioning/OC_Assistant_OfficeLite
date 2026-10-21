@@ -4,7 +4,6 @@ using OC.Assistant.Sdk;
 
 namespace OC.OfficeLite;
 
-[PluginIoType(IoType.Struct)]
 public class OfficeLite : PluginBase
 {
     /// <summary>
