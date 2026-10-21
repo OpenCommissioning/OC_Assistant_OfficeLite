@@ -7,7 +7,7 @@ which gives access to the Y200 shared memory process image of the robot controll
 
 ### Quick Getting Started
 - Download the zip file from the latest release page
-- Unpack the `OC.OfficeLite` zip file and place it in the directory or a subdirectory of the `OC.Assistant.exe`
+- Place the unpacked `OC.OfficeLite` folder in the `Plugins` folder of the `OC.Assistant.exe`
 - Start the `Y200_Svr.exe` on the OfficeLite VM
 - Make sure the VM accepts connections on the server port (default `40000`) and the IP address of the Assistant PC
 is allowed in the server configuration
