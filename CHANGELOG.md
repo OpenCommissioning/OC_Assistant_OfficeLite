@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.5.0"></a>
+## [1.5.0](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.5.0) (2026-10-23)
+
+### Features
+
+* adapt to .net 10 and latest sdk ([e1d724b](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/e1d724baa6e9b3585c40cff8804fb8a815b58de8))
+* connect directly to the Y200 server ([2589c77](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/commit/2589c77fe2c990eac498bb2c752d7f2f406c57a2))
+
 <a name="1.4.0"></a>
 ## [1.4.0](https://www.github.com/OpenCommissioning/OC_Assistant_OfficeLite/releases/tag/v1.4.0) (2026-06-23)
 
