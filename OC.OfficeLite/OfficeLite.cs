@@ -4,7 +4,6 @@ using OC.Assistant.Sdk;
 
 namespace OC.OfficeLite;
 
-[PluginIoType(IoType.Struct)]
 public class OfficeLite : PluginBase
 {
     /// <summary>
@@ -20,17 +19,24 @@ public class OfficeLite : PluginBase
     [PluginParameter("IP Address of the\nOfficeLite VM")]
     private readonly string _iPAddress = "192.168.0.1";
         
-    [PluginParameter("Default 50000")]
-    private readonly int _port = 50000;
-    
+    [PluginParameter("Port of the Y200_Svr.exe\nDefault 40000")]
+    private readonly int _port = 40000;
+
+    [PluginParameter("Y200IpcName from\nC:\\KRC\\User\\Y200Interface.config")]
+    private readonly string _y200IpcName = "Y200_VRC_R1";
+
+    [PluginParameter("Y200WriteOffset from\nC:\\KRC\\User\\Y200Interface.config")]
+    private readonly int _y200WriteOffset = 1024;
+
+    [PluginParameter("Y200ReadOffset from\nC:\\KRC\\User\\Y200Interface.config")]
+    private readonly int _y200ReadOffset = 0;
+
     [PluginParameter("Axis interpolation step time in milliseconds\n0 = no interpolation\nDefault value is 70")]
     private readonly int _interpolationTime = 70;
 
-    private TcpIpClient? _client;
-    private readonly byte[] _sendData = new byte [DATA_SIZE_TO_KRC];
+    private Y200Client? _client;
     private readonly byte[] _receiveData = new byte [DATA_SIZE_FROM_KRC];
     private readonly Interpolator[] _interpolator = new Interpolator[12];
-    private readonly StopwatchEx _stopwatch = new();
     
     protected override bool OnSave()
     {
@@ -58,13 +64,20 @@ public class OfficeLite : PluginBase
             return false;
         }
             
-        _stopwatch.Restart();
-        _client = new TcpIpClient(_iPAddress, _port);
-        _client.Start();
+        if (_y200WriteOffset < 0 || _y200ReadOffset < 0)
+        {
+            Logger.LogError(this, "Y200WriteOffset and Y200ReadOffset must not be negative");
+            return false;
+        }
+
+        _client = new Y200Client(_iPAddress, _port, _y200IpcName,
+            (uint)_y200WriteOffset, DATA_SIZE_FROM_KRC,
+            (uint)_y200ReadOffset, DATA_SIZE_TO_KRC);
         _client.OnConnected += ClientOnConnected;
-        _client.OnServerMessage += ClientOnServerMessage;
+        _client.OnReadData += ClientOnReadData;
         _client.OnError += message => Logger.LogWarning(this, message);
         for (var i = 0; i < 12; i++) _interpolator[i] = new Interpolator(_interpolationTime / 1000.0f);
+        _client.Start();
         return true;
     }
 
@@ -72,12 +85,14 @@ public class OfficeLite : PluginBase
     {
         try
         {
-            Array.Copy(InputBuffer, 0, _sendData, 0, 1024);
-            //Array.Copy(InputBuffer, 1024, _sendData, 1024, 4);
-            
-            Array.Copy(_receiveData, 0, OutputBuffer, 0, 1024);
-            AxisCopy();
-            //Array.Copy(_receiveData, 1144, OutputBuffer, 1072, 16);
+            _client?.SetWriteData(InputBuffer);
+
+            lock (_receiveData)
+            {
+                Array.Copy(_receiveData, 0, OutputBuffer, 0, 1024);
+                AxisCopy();
+                //Array.Copy(_receiveData, 1144, OutputBuffer, 1072, 16);
+            }
         }
         catch (Exception e)
         {
@@ -124,17 +139,16 @@ public class OfficeLite : PluginBase
         return activeNetworks.Any();
     }
 
-    private void ClientOnServerMessage(byte[] buffer, int messageLength)
+    private void ClientOnReadData(byte[] buffer)
     {
-        if (messageLength != DATA_SIZE_FROM_KRC) return;
-        Array.Copy(buffer, 0, _receiveData, 0, DATA_SIZE_FROM_KRC);
-        _stopwatch.WaitUntil(1);
-        _client?.Send(_sendData);
+        lock (_receiveData)
+        {
+            Array.Copy(buffer, 0, _receiveData, 0, DATA_SIZE_FROM_KRC);
+        }
     }
 
     private void ClientOnConnected()
     {
-        Logger.LogInfo(this, $"Connected to {_iPAddress}:{_port}");
-        _client?.Send(_sendData);
+        Logger.LogInfo(this, $"Connected to Y200 server {_iPAddress}:{_port}, process image '{_y200IpcName}'");
     }
 }

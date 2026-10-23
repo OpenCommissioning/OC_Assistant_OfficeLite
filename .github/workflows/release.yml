@@ -6,19 +6,19 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        
+
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
-    
+        dotnet-version: '10.0.x'
+
     - name: Install Versionize
       run: dotnet tool install --global Versionize
 
@@ -26,62 +26,29 @@ jobs:
       run: |
         git config --global user.email opencommissioning@spiratec.com
         git config --global user.name "oc-bot"
-      
+
     - name: Versioning
       id: versionize
       run: versionize --exit-insignificant-commits
-      continue-on-error: true
 
     - name: Get current version
-      if: steps.versionize.outcome == 'success'
-      run: |
-        $version = versionize inspect
-        echo "VERSION=v$version" >> $env:GITHUB_ENV
-      shell: pwsh
+      run: echo "VERSION=v$(versionize inspect)" >> "$GITHUB_ENV"
 
     - name: Get current changelog
-      if: steps.versionize.outcome == 'success'
-      run: |
-        $changelog = versionize changelog
-        Set-Content -Path latest_changelog.md -Value $changelog
-      shell: pwsh
+      run: versionize changelog > latest_changelog.md
 
     - name: Dotnet build
-      if: steps.versionize.outcome == 'success'
-      run: |
-        dotnet build OC.OfficeLite --configuration release --output ./Publish
-        dotnet build OC.OfficeLiteServer --configuration release --output ./Publish
-        
-    - name: Install AzureSignTool
-      run: dotnet tool install --global azuresigntool
+      run: dotnet build OC.OfficeLite --configuration release --output ./Publish
 
-    - name: Sign executable
-      if: steps.versionize.outcome == 'success'
-      run: |
-        azuresigntool sign `
-          -kvu ${{secrets.AZURE_KEY_VAULT}} `
-          -kvc ${{secrets.AZURE_CERT_NAME}} `
-          -kvt ${{secrets.AZURE_TENANT_ID}} `
-          -kvi ${{secrets.AZURE_CLIENT_ID}} `
-          -kvs ${{secrets.AZURE_CLIENT_SECRET}} `
-          -tr http://timestamp.globalsign.com/tsa/advanced `
-          -td sha256 `
-          ./Publish/OC.OfficeLite.dll `
-          ./Publish/OC.OfficeLiteServer.exe
-
-    - name: Zip signed artifacts
-      if: steps.versionize.outcome == 'success'
+    - name: Zip artifacts
       run: |
         mkdir OC.OfficeLite
         mv OC.OfficeLite.dll OC.OfficeLite/
         mv Config.plugin OC.OfficeLite/
-        Compress-Archive -Path OC.OfficeLite -DestinationPath OC.OfficeLite_${{env.VERSION}}.zip
-        Compress-Archive -Path OC.OfficeLiteServer.exe -DestinationPath OC.OfficeLiteServer_${{env.VERSION}}.zip
-      shell: pwsh
+        zip -r "OC.OfficeLite_$VERSION.zip" OC.OfficeLite
       working-directory: Publish
 
     - name: Push changes to GitHub
-      if: steps.versionize.outcome == 'success'
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -89,10 +56,8 @@ jobs:
         tags: true
 
     - name: Publish new release
-      if: steps.versionize.outcome == 'success'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create ${{env.VERSION}} -t "Release ${{env.VERSION}}" -F latest_changelog.md
-        gh release upload ${{env.VERSION}} ./Publish/OC.OfficeLite_${{env.VERSION}}.zip
-        gh release upload ${{env.VERSION}} ./Publish/OC.OfficeLiteServer_${{env.VERSION}}.zip
+        gh release create "$VERSION" -t "Release $VERSION" -F latest_changelog.md
+        gh release upload "$VERSION" "./Publish/OC.OfficeLite_$VERSION.zip"
